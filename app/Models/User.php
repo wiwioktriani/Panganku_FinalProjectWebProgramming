@@ -6,6 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\FoodDonation;
+use App\Models\FoodRequest;
+
+
 
 class User extends Authenticatable
 {
@@ -44,5 +49,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function foodDonations(): HasMany{
+        return $this->hasMany(FoodDonation::class);
+    }
+
+    public function foodRequests(): HasMany{
+        return $this->hasMany(FoodRequest::class);
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('food_donations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); 
-            $table->foreignId('category_id')->constrained('food_categories')->cascadeOnDelete();
+            $table->foreignId('food_category_id')->constrained('food_categories')->cascadeOnDelete();
 
             //data makanan
             $table->string('food_name');

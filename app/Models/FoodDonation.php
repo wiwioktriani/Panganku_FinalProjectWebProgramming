@@ -31,4 +31,9 @@ class FoodDonation extends Model
     {
         return $this->hasMany(FoodRequest::class);
     }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(FoodCategory::class, 'food_category_id');
+    }
 }

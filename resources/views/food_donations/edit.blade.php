@@ -1,80 +1,92 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Edit Food Donation</h1>
+<div class="py-12">
+    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
+                <h2 class="text-2xl font-bold mb-6">{{ __('Edit Donasi Makanan') }}</h2>
 
-    {{-- Validation Errors --}}
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <ul class="list-disc list-inside">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+                <form method="POST" action="{{ route('donations.update', $donation) }}" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Nama Makanan -->
+                    <div>
+                        <x-input-label for="food_name" :value="__('Nama Makanan')" />
+                        <x-text-input id="food_name" name="food_name" type="text" class="mt-1 block w-full"
+                                      :value="old('food_name', $donation->food_name)" required autofocus />
+                        <x-input-error :messages="$errors->get('food_name')" class="mt-2" />
+                    </div>
+
+                    <!-- Kategori -->
+                    <div>
+                        <x-input-label for="food_category_id" :value="__('Kategori')" />
+                        <select id="food_category_id" name="food_category_id"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                            <option value="">{{ __('Pilih Kategori') }}</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                        {{ old('food_category_id', $donation->food_category_id) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('food_category_id')" class="mt-2" />
+                    </div>
+
+                    <!-- Jumlah -->
+                    <div>
+                        <x-input-label for="quantity" :value="__('Jumlah')" />
+                        <x-text-input id="quantity" name="quantity" type="number" min="1" class="mt-1 block w-full"
+                                      :value="old('quantity', $donation->quantity)" required />
+                        <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
+                    </div>
+
+                    <!-- Tanggal Kadaluarsa -->
+                    <div>
+                        <x-input-label for="expired_at" :value="__('Tanggal Kadaluarsa')" />
+                        <x-text-input id="expired_at" name="expired_at" type="date" class="mt-1 block w-full"
+                                      :value="old('expired_at', $donation->expired_at?->format('Y-m-d'))" required />
+                        <x-input-error :messages="$errors->get('expired_at')" class="mt-2" />
+                    </div>
+
+                    <!-- Status (khusus edit) -->
+                    <div>
+                        <x-input-label for="status" :value="__('Status')" />
+                        <select id="status" name="status"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                            <option value="active" {{ old('status', $donation->status) === 'active' ? 'selected' : '' }}>
+                                {{ __('Aktif') }}
+                            </option>
+                            <option value="inactive" {{ old('status', $donation->status) === 'inactive' ? 'selected' : '' }}>
+                                {{ __('Tidak Aktif') }}
+                            </option>
+                        </select>
+                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div>
+                        <x-input-label for="description" :value="__('Deskripsi')" />
+                        <textarea id="description" name="description" rows="4"
+                                  class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            {{ old('description', $donation->description) }}
+                        </textarea>
+                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex items-center gap-4">
+                        <x-primary-button>{{ __('Update Donasi') }}</x-primary-button>
+
+                        <a href="{{ route('donations.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
+                            {{ __('Batal') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    @endif
-
-    <form action="{{ route('donations.update', $donation->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-            <label for="food_name" class="block text-gray-700 font-bold mb-2">Food Name</label>
-            <input type="text" name="food_name" id="food_name" value="{{ old('food_name', $donation->food_name) }}" 
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label for="food_category_id" class="block text-gray-700 font-bold mb-2">Category</label>
-            <select name="food_category_id" id="food_category_id" 
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                <option value="">-- Select Category --</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ old('food_category_id', $donation->food_category_id) == $category->id ? 'selected' : '' }}>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="quantity" class="block text-gray-700 font-bold mb-2">Quantity</label>
-            <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $donation->quantity) }}" 
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" min="1" required>
-        </div>
-
-        <div class="mb-4">
-            <label for="expired_at" class="block text-gray-700 font-bold mb-2">Expiration Date</label>
-            <input type="date" name="expired_at" id="expired_at" value="{{ old('expired_at', $donation->expired_at->format('Y-m-d')) }}" 
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label for="status" class="block text-gray-700 font-bold mb-2">Status</label>
-            <select name="status" id="status" 
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                <option value="active" {{ old('status', $donation->status) == 'active' ? 'selected' : '' }}>Active</option>
-                <option value="inactive" {{ old('status', $donation->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="description" class="block text-gray-700 font-bold mb-2">Description</label>
-            <textarea name="description" id="description" rows="3" 
-                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('description', $donation->description) }}</textarea>
-        </div>
-
-        <div class="flex items-center justify-between">
-            <button type="submit" 
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Update Donation
-            </button>
-            <a href="{{ route('donations.index') }}" 
-               class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-               Cancel
-            </a>
-        </div>
-    </form>
+    </div>
 </div>
 @endsection

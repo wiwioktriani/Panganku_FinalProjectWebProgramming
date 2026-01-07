@@ -5,15 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\FoodRequest;
 use App\Models\FoodDonation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FoodRequestController extends Controller
 {
+    private function authorizeRequest(FoodRequest $foodRequest)
+    {
+        if (
+            Auth::user()->role !== 'admin' &&
+            $foodRequest->user_id !== Auth::id()
+        ) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     public function index()
     {
-        $requests = FoodRequest::with('foodDonation')
-            ->where('user_id', auth()->id())
+        $requests = FoodRequest::with(['foodDonation', 'user'])
+            ->when(Auth::user()->role !== 'admin', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
             ->latest()
-            ->get();
+            ->paginate(15);
 
         return view('food_requests.index', compact('requests'));
     }
@@ -45,7 +58,7 @@ class FoodRequestController extends Controller
         }
 
         FoodRequest::create([
-            'user_id'          => auth()->id(),
+            'user_id'          => Auth::id(),
             'food_donation_id' => $donation->id,
             'quantity'         => $request->quantity,
             'status'           => 'pending',
@@ -57,9 +70,7 @@ class FoodRequestController extends Controller
 
     public function edit(FoodRequest $foodRequest)
     {
-        if ($foodRequest->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorizeRequest($foodRequest);
 
         if ($foodRequest->status !== 'pending') {
             return redirect()->route('requests.index')
@@ -71,16 +82,14 @@ class FoodRequestController extends Controller
             ->get();
 
         return view('food_requests.edit', [
-            'request' => $foodRequest,
+            'request'   => $foodRequest,
             'donations' => $donations
         ]);
     }
 
     public function update(Request $request, FoodRequest $foodRequest)
     {
-        if ($foodRequest->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorizeRequest($foodRequest);
 
         if ($foodRequest->status !== 'pending') {
             return redirect()->route('requests.index')
@@ -113,9 +122,7 @@ class FoodRequestController extends Controller
 
     public function destroy(FoodRequest $foodRequest)
     {
-        if ($foodRequest->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorizeRequest($foodRequest);
 
         if ($foodRequest->status !== 'pending') {
             return back()->with('error', 'Request tidak bisa dibatalkan');

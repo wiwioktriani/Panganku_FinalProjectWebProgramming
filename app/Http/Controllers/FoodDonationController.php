@@ -9,11 +9,26 @@ use Illuminate\Support\Facades\Auth;
 
 class FoodDonationController extends Controller
 {
+    private function authorizeDonation(FoodDonation $donation)
+    {
+        if (
+            Auth::user()->role !== 'admin' &&
+            $donation->user_id !== Auth::id()
+        ) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     public function index()
     {
+        // Admin bisa lihat semua
+        // User hanya lihat donation miliknya
         $donations = FoodDonation::with(['user', 'category'])
+            ->when(Auth::user()->role !== 'admin', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
             ->latest()
-            ->get();
+            ->paginate(15);
 
         return view('food_donations.index', compact('donations'));
     }
@@ -37,11 +52,11 @@ class FoodDonationController extends Controller
         FoodDonation::create([
             'user_id' => Auth::id(),
             'food_name' => $request->food_name,
-            'food_category_id' => $request->food_category_id,
+            'category_id' => $request->food_category_id,
             'quantity' => $request->quantity,
             'expired_at' => $request->expired_at,
             'description' => $request->description,
-            'status' => 'active',
+            'status' => 'available',
         ]);
 
         return redirect()->route('donations.index')
@@ -50,9 +65,7 @@ class FoodDonationController extends Controller
 
     public function edit(FoodDonation $donation)
     {
-        if ($donation->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorizeDonation($donation);
 
         $categories = FoodCategory::all();
         return view('food_donations.edit', compact('donation', 'categories'));
@@ -60,9 +73,7 @@ class FoodDonationController extends Controller
 
     public function update(Request $request, FoodDonation $donation)
     {
-        if ($donation->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorizeDonation($donation);
 
         $request->validate([
             'food_category_id' => 'required|exists:food_categories,id',
@@ -74,7 +85,7 @@ class FoodDonationController extends Controller
         ]);
 
         $donation->update([
-            'food_category_id' => $request->food_category_id,
+            'category_id' => $request->food_category_id,
             'food_name' => $request->food_name,
             'quantity' => $request->quantity,
             'expired_at' => $request->expired_at,
@@ -88,9 +99,7 @@ class FoodDonationController extends Controller
 
     public function destroy(FoodDonation $donation)
     {
-        if ($donation->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorizeDonation($donation);
 
         $donation->delete();
 

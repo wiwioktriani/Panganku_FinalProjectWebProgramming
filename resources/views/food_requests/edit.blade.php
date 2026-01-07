@@ -2,7 +2,9 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto py-8">
-    <h1 class="text-2xl font-bold mb-6">Edit Food Request</h1>
+    <h1 class="text-2xl font-bold mb-6">
+        {{ __('food_requests.edit_title') }}
+    </h1>
 
     {{-- Validation Errors --}}
     @if ($errors->any())
@@ -20,20 +22,25 @@
         @method('PUT')
 
         <div>
-            <label class="block text-gray-700 font-medium mb-1">Choose Donation</label>
+            <label class="block text-gray-700 font-medium mb-1">
+                {{ __('food_requests.choose_donation') }}
+            </label>
             <select name="food_donation_id" required
                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 @foreach($donations as $donation)
                     <option value="{{ $donation->id }}"
                         {{ $donation->id == $request->food_donation_id ? 'selected' : '' }}>
-                        {{ $donation->food_name }} (Stock: {{ $donation->quantity }})
+                        {{ $donation->food_name }}
+                        ({{ __('food_requests.stock') }}: {{ $donation->quantity }})
                     </option>
                 @endforeach
             </select>
         </div>
 
         <div>
-            <label class="block text-gray-700 font-medium mb-1">Quantity</label>
+            <label class="block text-gray-700 font-medium mb-1">
+                {{ __('food_requests.quantity') }}
+            </label>
             <input type="number"
                    name="quantity"
                    min="1"
@@ -45,11 +52,11 @@
         <div class="flex space-x-3">
             <button type="submit"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Update Request
+                {{ __('food_requests.update_request') }}
             </button>
             <a href="{{ route('requests.index') }}"
                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                Cancel
+                {{ __('common.cancel') }}
             </a>
         </div>
     </form>

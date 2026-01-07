@@ -9,7 +9,7 @@ class FoodCategoryController extends Controller
 {
     public function index()
     {
-        $categories = FoodCategory::latest()->get();
+        $categories = FoodCategory::latest()->paginate(15);
         return view('food_categories.index', compact('categories'));
     }
 

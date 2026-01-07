@@ -1,37 +1,41 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Edit Category</h1>
+<div class="py-12">
+    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
+                <h2 class="text-2xl font-bold mb-6">{{ __('Edit Kategori Makanan') }}</h2>
 
-    {{-- Error validation --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+                <form method="POST" action="{{ route('categories.update', $category) }}" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <x-input-label for="name" :value="__('Nama Kategori')" />
+                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"
+                                      :value="old('name', $category->name)" required autofocus />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="description" :value="__('Deskripsi')" />
+                        <textarea id="description" name="description" rows="4"
+                                  class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            {{ old('description', $category->description) }}
+                        </textarea>
+                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <x-primary-button>{{ __('Update Kategori') }}</x-primary-button>
+                        <a href="{{ route('categories.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
+                            {{ __('Batal') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    @endif
-
-    <form action="{{ route('categories.update', $category) }}" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-3">
-            <label>Name</label>
-            <input type="text" name="name" class="form-control"
-                   value="{{ old('name', $category->name) }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea name="description" class="form-control">{{ old('description', $category->description) }}</textarea>
-        </div>
-
-        <button class="btn btn-primary">Update</button>
-        <a href="{{ route('categories.index') }}" class="btn btn-secondary">Back</a>
-    </form>
+    </div>
 </div>
 @endsection

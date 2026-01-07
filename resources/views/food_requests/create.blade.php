@@ -1,60 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto py-8">
-    <h1 class="text-2xl font-bold mb-6">Create Food Request</h1>
+<div class="py-12">
+    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
+                <h2 class="text-2xl font-bold mb-6">{{ __('Buat Permintaan Makanan') }}</h2>
 
-    {{-- Validation Errors --}}
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            <ul class="list-disc list-inside">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+                <form method="POST" action="{{ route('requests.store') }}" class="space-y-6">
+                    @csrf
+
+                    <!-- Pilih Donasi -->
+                    <div>
+                        <x-input-label for="food_donation_id" :value="__('Pilih Donasi')" />
+                        <select id="food_donation_id" name="food_donation_id"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                            <option value="">{{ __('Pilih donasi yang tersedia') }}</option>
+                            @forelse($donations as $donation)
+                                <option value="{{ $donation->id }}" {{ old('food_donation_id') == $donation->id ? 'selected' : '' }}>
+                                    {{ $donation->food_name }} (Stok: {{ $donation->quantity }})
+                                </option>
+                            @empty
+                                <option disabled>{{ __('Tidak ada donasi tersedia') }}</option>
+                            @endforelse
+                        </select>
+                        <x-input-error :messages="$errors->get('food_donation_id')" class="mt-2" />
+                    </div>
+
+                    <!-- Jumlah -->
+                    <div>
+                        <x-input-label for="quantity" :value="__('Jumlah yang Diminta')" />
+                        <x-text-input id="quantity" name="quantity" type="number" min="1" class="mt-1 block w-full"
+                                      :value="old('quantity')" required />
+                        <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex items-center gap-4">
+                        <x-primary-button>{{ __('Kirim Permintaan') }}</x-primary-button>
+                        <a href="{{ route('requests.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
+                            {{ __('Batal') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    @endif
-
-    <form action="{{ route('requests.store') }}" method="POST" class="space-y-4">
-        @csrf
-
-        <div>
-            <label class="block text-gray-700 font-medium mb-1">Choose Donation</label>
-            <select name="food_donation_id"
-                    required
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <option value="">-- Select Donation --</option>
-                @forelse($donations as $donation)
-                    <option value="{{ $donation->id }}"
-                        {{ old('food_donation_id') == $donation->id ? 'selected' : '' }}>
-                        {{ $donation->food_name }} (Stock: {{ $donation->quantity }})
-                    </option>
-                @empty
-                    <option disabled>No available donations</option>
-                @endforelse
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-gray-700 font-medium mb-1">Quantity</label>
-            <input type="number"
-                   name="quantity"
-                   min="1"
-                   value="{{ old('quantity') }}"
-                   required
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
-
-        <div class="flex space-x-3">
-            <button type="submit"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Submit Request
-            </button>
-            <a href="{{ route('requests.index') }}"
-               class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                Back
-            </a>
-        </div>
-    </form>
+    </div>
 </div>
 @endsection

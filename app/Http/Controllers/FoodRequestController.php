@@ -11,29 +11,29 @@ class FoodRequestController extends Controller
 {
     private function authorizeRequest(FoodRequest $foodRequest)
     {
-        if (
-            Auth::user()->role !== 'admin' &&
-            $foodRequest->user_id !== Auth::id()
-        ) {
+        
+        if (Auth::user()->role !== 'admin' && $foodRequest->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
     }
 
     public function index()
     {
-        $requests = FoodRequest::with(['foodDonation', 'user'])
+        $foodRequests = FoodRequest::with(['foodDonation', 'user'])
             ->when(Auth::user()->role !== 'admin', function ($query) {
                 $query->where('user_id', Auth::id());
             })
             ->latest()
             ->paginate(15);
 
-        return view('food_requests.index', compact('requests'));
+        return view('food_requests.index', compact('foodRequests'));
     }
 
+  
     public function create()
     {
-        $donations = FoodDonation::where('status', 'available')
+     
+        $donations = FoodDonation::where('user_id', '!=', Auth::id())
             ->where('quantity', '>', 0)
             ->get();
 
@@ -51,9 +51,7 @@ class FoodRequestController extends Controller
 
         if ($request->quantity > $donation->quantity) {
             return back()
-                ->withErrors([
-                    'quantity' => 'Jumlah request melebihi stok yang tersedia'
-                ])
+                ->withErrors(['quantity' => 'Jumlah request melebihi stok yang tersedia'])
                 ->withInput();
         }
 
@@ -82,8 +80,8 @@ class FoodRequestController extends Controller
             ->get();
 
         return view('food_requests.edit', [
-            'request'   => $foodRequest,
-            'donations' => $donations
+            'foodRequest' => $foodRequest,
+            'donations'   => $donations
         ]);
     }
 
@@ -105,9 +103,7 @@ class FoodRequestController extends Controller
 
         if ($request->quantity > $donation->quantity) {
             return back()
-                ->withErrors([
-                    'quantity' => 'Jumlah request melebihi stok yang tersedia'
-                ])
+                ->withErrors(['quantity' => 'Jumlah request melebihi stok yang tersedia'])
                 ->withInput();
         }
 
@@ -132,5 +128,32 @@ class FoodRequestController extends Controller
 
         return redirect()->route('requests.index')
             ->with('success', 'Request berhasil dibatalkan');
+    }
+
+    public function approve(FoodRequest $foodRequest)
+    {
+        if ($foodRequest->foodDonation->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Update status request
+        $foodRequest->update(['status' => 'approved']);
+
+        // Kurangi jumlah stok makanan
+        $donation = $foodRequest->foodDonation;
+        $donation->decrement('quantity', $foodRequest->quantity);
+
+        return back()->with('success', 'Permintaan telah disetujui.');
+    }
+
+    public function reject(FoodRequest $foodRequest)
+    {
+        if ($foodRequest->foodDonation->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $foodRequest->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Permintaan telah ditolak.');
     }
 }

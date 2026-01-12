@@ -43,8 +43,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $donation->quantity }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $donation->expired_at->format('d M Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span class="{{ $donation->status === 'available' ? 'text-green-600' : 'text-red-600' }} font-medium">
-                                                {{ ucfirst($donation->status) }}
+                                            <span class="{{ $donation->status === 'available' ? 'text-green-600' : 'text-red-600' }}">
+                                                {{ $donation->status === 'available' ? 'Tersedia' : 'Tidak Tersedia' }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">

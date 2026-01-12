@@ -56,11 +56,11 @@
                         <x-input-label for="status" :value="__('Status')" />
                         <select id="status" name="status"
                                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                            <option value="active" {{ old('status', $donation->status) === 'active' ? 'selected' : '' }}>
-                                {{ __('Aktif') }}
+                            <option value="available" {{ old('status', $donation->status) === 'available' ? 'selected' : '' }}>
+                                {{ __('Tersedia') }}
                             </option>
-                            <option value="inactive" {{ old('status', $donation->status) === 'inactive' ? 'selected' : '' }}>
-                                {{ __('Tidak Aktif') }}
+                            <option value="unavailable" {{ old('status', $donation->status) === 'unavailable' ? 'selected' : '' }}>
+                                {{ __('Tidak Tersedia') }}
                             </option>
                         </select>
                         <x-input-error :messages="$errors->get('status')" class="mt-2" />

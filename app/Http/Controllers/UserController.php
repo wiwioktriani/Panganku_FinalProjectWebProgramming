@@ -60,9 +60,9 @@ class UserController extends Controller
                          ->with('success', 'User updated successfully');
     }
 
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::findOrFail($id); // Ambil user berdasarkan ID atau tampilkan 404
+        $user = User::findOrFail($id);
         return view('users.show', compact('user'));
     }
 

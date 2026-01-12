@@ -1,72 +1,61 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">{{ __('app.food_donation_details') }}</h1>
+<div class="py-12">
+    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900 space-y-4">
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title">{{ $donation->food_name }}</h5>
+                <h2 class="text-2xl font-bold mb-4">
+                    Detail Donasi Makanan
+                </h2>
 
-            <p class="card-text">
-                <strong>{{ __('app.category') }}:</strong> {{ $donation->category->name ?? '-' }}
-            </p>
+                <div>
+                    <span class="font-semibold">Nama Makanan:</span>
+                    <p>{{ $donation->food_name }}</p>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.quantity') }}:</strong> {{ $donation->quantity }}
-            </p>
+                <div>
+                    <span class="font-semibold">Kategori:</span>
+                    <p>{{ $donation->category?->name ?? 'Tidak ada kategori' }}</p>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.expiration_date') }}:</strong>
-                {{ $donation->expired_at->format('d M Y') }}
-            </p>
+                <div>
+                    <span class="font-semibold">Jumlah:</span>
+                    <p>{{ $donation->quantity }}</p>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.status') }}:</strong>
-                @if($donation->status === 'active')
-                    <span class="text-green-600 font-semibold">{{ __('app.active') }}</span>
-                @else
-                    <span class="text-red-600 font-semibold">{{ __('app.inactive') }}</span>
-                @endif
-            </p>
+                <div>
+                    <span class="font-semibold">Tanggal Kadaluarsa:</span>
+                    <p>{{ $donation->expired_at->format('d M Y') }}</p>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.description') }}:</strong> {{ $donation->description ?? '-' }}
-            </p>
+                <div>
+                    <span class="font-semibold">Status:</span>
+                    <span class="{{ $donation->status === 'available' ? 'text-green-600' : 'text-red-600' }} font-medium">
+                        {{ ucfirst($donation->status) }}
+                    </span>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.created_by') }}:</strong> {{ $donation->user->name ?? '-' }}
-            </p>
+                <div>
+                    <span class="font-semibold">Deskripsi:</span>
+                    <p>{{ $donation->description ?? '-' }}</p>
+                </div>
 
-            <p class="card-text">
-                <strong>{{ __('app.created_at') }}:</strong>
-                {{ $donation->created_at->format('d M Y H:i') }}
-            </p>
+                <div class="pt-6 flex gap-4">
+                    <a href="{{ route('donations.edit', $donation) }}"
+                       class="text-indigo-600 hover:text-indigo-800 font-medium">
+                        Edit
+                    </a>
+
+                    <a href="{{ route('donations.index') }}"
+                       class="text-gray-600 hover:text-gray-800">
+                        Kembali
+                    </a>
+                </div>
+
+            </div>
         </div>
-    </div>
-
-    <div class="flex space-x-2">
-        <a href="{{ route('donations.index') }}"
-           class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-            {{ __('app.back_to_list') }}
-        </a>
-
-        @if($donation->user_id === auth()->id())
-            <a href="{{ route('donations.edit', $donation->id) }}"
-               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                {{ __('app.edit') }}
-            </a>
-
-            <form action="{{ route('donations.destroy', $donation->id) }}" method="POST"
-                  onsubmit="return confirm('{{ __('app.are_you_sure') }}');">
-                @csrf
-                @method('DELETE')
-                <button type="submit"
-                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    {{ __('app.delete') }}
-                </button>
-            </form>
-        @endif
     </div>
 </div>
 @endsection

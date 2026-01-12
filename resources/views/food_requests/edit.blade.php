@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form action="{{ route('requests.update', $request->id) }}" method="POST" class="space-y-4">
+    <form action="{{ route('requests.update', $foodRequest) }}" method="POST" class="space-y-4">
         @csrf
         @method('PUT')
 
@@ -29,7 +29,7 @@
                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 @foreach($donations as $donation)
                     <option value="{{ $donation->id }}"
-                        {{ $donation->id == $request->food_donation_id ? 'selected' : '' }}>
+                        {{ $donation->id == $foodRequest->food_donation_id ? 'selected' : '' }}>
                         {{ $donation->food_name }}
                         ({{ __('food_requests.stock') }}: {{ $donation->quantity }})
                     </option>
@@ -44,7 +44,7 @@
             <input type="number"
                    name="quantity"
                    min="1"
-                   value="{{ $request->quantity }}"
+                   value="{{ old('quantity', $foodRequest->quantity }}"
                    required
                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>

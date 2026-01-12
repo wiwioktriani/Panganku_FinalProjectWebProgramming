@@ -12,7 +12,7 @@
                     </a>
                 </div>
 
-                @if($requests->isEmpty())
+                @if($foodRequests->isEmpty())
                     <div class="text-center py-12">
                         <p class="text-gray-500 text-lg">{{ __('Belum ada permintaan.') }}</p>
                         <a href="{{ route('requests.create') }}" class="mt-4 inline-block text-indigo-600 hover:text-indigo-800 font-medium">
@@ -33,22 +33,22 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($requests as $request)
+                                @foreach($foodRequests as $foodRequest)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $request->user->name ?? '-' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->foodDonation->food_name ?? '-' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->quantity }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $foodRequest->user->name ?? '-' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $foodRequest->foodDonation->food_name ?? '-' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $foodRequest->quantity }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                                {{ $request->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
-                                                {{ __('food_requests.status_' . $request->status) }}
+                                                {{ $foodRequest->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                                                {{ __('food_requests.status_' . $foodRequest->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $request->created_at->format('d M Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ optional ($foodRequest->created_at)->format('d M Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                            @if($request->status === 'pending')
-                                                <a href="{{ route('requests.edit', $request) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
-                                                <form action="{{ route('requests.destroy', $request) }}" method="POST" class="inline">
+                                            @if($foodRequest->status === 'pending')
+                                                <a href="{{ route('requests.edit', $foodRequest) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
+                                                <form action="{{ route('requests.destroy', $foodRequest) }}" method="POST" class="inline">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" onclick="return confirm('Yakin batalkan permintaan?')" class="text-red-600 hover:text-red-900">
                                                         {{ __('Batal') }}
@@ -65,7 +65,7 @@
                     </div>
 
                     <div class="mt-6">
-                        {{ $requests->links() }}
+                        {{ $foodRequests->links() }}
                     </div>
                 @endif
             </div>

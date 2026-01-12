@@ -18,30 +18,38 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
 
     // ======================
-    // PROFILE (ALL ROLES)
+    // PROFILE
     // ======================
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ======================
-    // USER FEATURES
+    // DONATIONS
     // ======================
-    Route::middleware('role:user')->group(function () {
-        Route::resource('donations', FoodDonationController::class);
-        Route::resource('requests', FoodRequestController::class);
-    });
+    Route::resource('donations', FoodDonationController::class);
+
+    Route::get('/donations/incoming-requests', [FoodDonationController::class, 'incomingRequests'])
+        ->name('donations.incoming');
 
     // ======================
-    // ADMIN FEATURES
+    // FOOD REQUESTS
+    // ======================
+    Route::resource('requests', FoodRequestController::class);
+
+    Route::patch('/requests/{request}/approve', [FoodRequestController::class, 'approve'])
+        ->name('requests.approve');
+
+    Route::patch('/requests/{request}/reject', [FoodRequestController::class, 'reject'])
+        ->name('requests.reject');
+
+    // ======================
+    // ADMIN ONLY
     // ======================
     Route::middleware('role:admin')->group(function () {
-        Route::resource('donations', FoodDonationController::class);
-        Route::resource('requests', FoodRequestController::class);
         Route::resource('categories', FoodCategoryController::class);
         Route::resource('users', UserController::class);
     });
 });
 
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FoodDonation;
 use App\Models\FoodCategory;
+use App\Models\FoodRequest; // ✅ Jangan lupa import ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,8 +22,6 @@ class FoodDonationController extends Controller
 
     public function index()
     {
-        // Admin bisa lihat semua
-        // User hanya lihat donation miliknya
         $donations = FoodDonation::with(['user', 'category'])
             ->when(Auth::user()->role !== 'admin', function ($query) {
                 $query->where('user_id', Auth::id());
@@ -63,6 +62,11 @@ class FoodDonationController extends Controller
             ->with('success', 'Donasi berhasil ditambahkan');
     }
 
+    public function show(FoodDonation $donation)
+    {
+        return view('food_donations.show', compact('donation'));
+    }
+
     public function edit(FoodDonation $donation)
     {
         $this->authorizeDonation($donation);
@@ -95,6 +99,23 @@ class FoodDonationController extends Controller
 
         return redirect()->route('donations.index')
             ->with('success', 'Donasi berhasil diperbarui');
+    }
+
+    // ======================
+    // METHOD INCOMING REQUESTS
+    // ======================
+    public function incomingRequests()
+    {
+        // Ambil semua request untuk donasi milik user login
+        $requests = FoodRequest::with(['user', 'foodDonation'])
+            ->whereHas('foodDonation', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
+            ->latest()
+            ->get();
+
+        // Kirim ke view di folder food_donations
+        return view('food_donations.incoming_requests', compact('requests'));
     }
 
     public function destroy(FoodDonation $donation)

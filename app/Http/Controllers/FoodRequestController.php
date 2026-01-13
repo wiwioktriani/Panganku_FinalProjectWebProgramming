@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class FoodRequestController extends Controller
 {
-    private function authorizeRequest(FoodRequest $foodRequest)
-    {
-        
-        if (Auth::user()->role !== 'admin' && $foodRequest->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
-    }
 
     public function index()
     {
@@ -68,7 +61,9 @@ class FoodRequestController extends Controller
 
     public function edit(FoodRequest $foodRequest)
     {
-        $this->authorizeRequest($foodRequest);
+        if ($foodRequest->user_id !== Auth::id()){
+            abort(403);
+        }
 
         if ($foodRequest->status !== 'pending') {
             return redirect()->route('requests.index')
@@ -118,8 +113,11 @@ class FoodRequestController extends Controller
 
     public function destroy(FoodRequest $foodRequest)
     {
-        $this->authorizeRequest($foodRequest);
-
+        
+        if ($foodRequest->user_id !== Auth::id()){
+            abort(403);
+        }
+        
         if ($foodRequest->status !== 'pending') {
             return back()->with('error', 'Request tidak bisa dibatalkan');
         }
@@ -132,14 +130,14 @@ class FoodRequestController extends Controller
 
     public function approve(FoodRequest $foodRequest)
     {
+        $foodRequest->load('foodDonation');
+
         if ($foodRequest->foodDonation->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Update status request
         $foodRequest->update(['status' => 'approved']);
 
-        // Kurangi jumlah stok makanan
         $donation = $foodRequest->foodDonation;
         $donation->decrement('quantity', $foodRequest->quantity);
 
@@ -148,6 +146,8 @@ class FoodRequestController extends Controller
 
     public function reject(FoodRequest $foodRequest)
     {
+        $foodRequest->load('foodDonation');
+
         if ($foodRequest->foodDonation->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }

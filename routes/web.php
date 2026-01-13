@@ -7,6 +7,7 @@ use App\Http\Controllers\FoodCategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -27,20 +28,21 @@ Route::middleware('auth')->group(function () {
     // ======================
     // DONATIONS
     // ======================
-    Route::resource('donations', FoodDonationController::class);
 
     Route::get('/donations/incoming-requests', [FoodDonationController::class, 'incomingRequests'])
         ->name('donations.incoming');
 
+    Route::resource('donations', FoodDonationController::class);
+
     // ======================
     // FOOD REQUESTS
     // ======================
-    Route::resource('requests', FoodRequestController::class);
+    Route::resource('requests', FoodRequestController::class) ->parameters(['requests' => 'foodRequest']);
 
-    Route::patch('/requests/{request}/approve', [FoodRequestController::class, 'approve'])
+    Route::patch('/requests/{foodRequest}/approve', [FoodRequestController::class, 'approve'])
         ->name('requests.approve');
 
-    Route::patch('/requests/{request}/reject', [FoodRequestController::class, 'reject'])
+    Route::patch('/requests/{foodRequest}/reject', [FoodRequestController::class, 'reject'])
         ->name('requests.reject');
 
     // ======================
@@ -50,6 +52,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', FoodCategoryController::class);
         Route::resource('users', UserController::class);
     });
+
 });
 
 require __DIR__ . '/auth.php';

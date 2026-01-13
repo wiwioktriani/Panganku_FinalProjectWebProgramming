@@ -44,7 +44,7 @@
             <input type="number"
                    name="quantity"
                    min="1"
-                   value="{{ old('quantity', $foodRequest->quantity }}"
+                   value="{{ old('quantity', $foodRequest->quantity) }}"
                    required
                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>

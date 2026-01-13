@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FoodDonation;
 use App\Models\FoodCategory;
-use App\Models\FoodRequest; // ✅ Jangan lupa import ini
+use App\Models\FoodRequest; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -106,7 +106,6 @@ class FoodDonationController extends Controller
     // ======================
     public function incomingRequests()
     {
-        // Ambil semua request untuk donasi milik user login
         $requests = FoodRequest::with(['user', 'foodDonation'])
             ->whereHas('foodDonation', function ($q) {
                 $q->where('user_id', auth()->id());
@@ -114,7 +113,6 @@ class FoodDonationController extends Controller
             ->latest()
             ->get();
 
-        // Kirim ke view di folder food_donations
         return view('food_donations.incoming_requests', compact('requests'));
     }
 

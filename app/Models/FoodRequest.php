@@ -24,6 +24,6 @@ class FoodRequest extends Model
 
     public function foodDonation(): BelongsTo
     {
-        return $this->belongsTo(FoodDonation::class);
+        return $this->belongsTo(FoodDonation::class, 'food_donation_id');
     }
 }

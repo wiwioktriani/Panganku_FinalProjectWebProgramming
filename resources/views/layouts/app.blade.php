@@ -10,12 +10,23 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-gray-100 min-h-screen flex flex-col">
-
     <!-- Navbar -->
     <nav class="bg-white border-b border-gray-200 px-4 py-4">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
             <div class="flex items-center">
-                <a href="{{ url('/') }}" class="text-2xl font-bold text-green-600">Panganku</a>
+                <a href="{{ url('/') }}" class="flex items-center gap-2">
+                    <img 
+                        src="{{ asset('build/assets/image/panganku-logo.jpeg') }}" 
+                        alt="Panganku Logo"
+                        class="h-10 w-auto"
+                    >
+                    <span class="text-2xl font-bold text-green-600">
+                        Panganku
+                    </span>
+                </a>
+
+
+
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex ml-10 space-x-8">
